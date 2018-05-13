@@ -38,6 +38,9 @@
   </div>
 </template>
 <script type="text/javascript">
+
+import Api from './../services/api/api.service'
+
 export default {
   name: "ForgotPassword",
   data() {
@@ -54,29 +57,55 @@ export default {
   methods: {
     sendEmail: function() {
       var self = this;
-      
-      this.remainingSeconds = 10;
-      this.disableSendEmail = true;
-      var secondsInterval = setInterval(function(){
-        if(self.remainingSeconds > 0) {          
-          self.remainingSeconds = self.remainingSeconds - 1;
-        }
-      }, 1000);
-      setTimeout(function(){
-        self.disableSendEmail = false;
-        self.remainingSeconds = 10;
-        clearInterval(secondsInterval);
-      }, 10000)
 
-      if (!this.user.email) {
-        return 0;
+      let user = {
+        email: this.user.email
       }
-      this.showVerificationForm = true;
+      Api.post('/forgot-password', user)
+      .then(response => {
+        console.log(response);
+              
+        self.remainingSeconds = 10;
+        self.disableSendEmail = true;
+        var secondsInterval = setInterval(function(){
+          if(self.remainingSeconds > 0) {          
+            self.remainingSeconds = self.remainingSeconds - 1;
+          }
+        }, 1000);
+        setTimeout(function(){
+          self.disableSendEmail = false;
+          self.remainingSeconds = 10;
+          clearInterval(secondsInterval);
+        }, 10000)
+
+        if (!self.user.email) {
+          return 0;
+        }
+        self.showVerificationForm = true;
+      })
+      .catch(err => {
+        console.log(err);
+      })
     },
     verifyUser: function() {
       if (!this.user.verificationCode) {
         return 0;
       }
+
+      let user = {
+        email :this.user.email,
+        verificationCode: this.user.verificationCode
+      };
+
+      Api.post('/verify-user', user)
+      .then(response => {
+        console.log(response);
+        this.$router.push({name: 'ResetPassword'});
+      })
+      .catch(err => {
+        console.log(err);
+      })
+
     }
   }
 };

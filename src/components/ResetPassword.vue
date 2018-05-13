@@ -18,6 +18,8 @@
 </template>
 <script type="text/javascript">
 
+  import Api from './../services/api/api.service'
+
   export default {
     name: 'ResetPassword',
     data () {
@@ -33,7 +35,15 @@
         if (!this.user.password || !this.user.confirmPassword) {
           return 0
         }
-  
+
+        Api.post('/reset-password', this.user)
+        .then(response => {
+          console.log(response);
+          this.$router.push({name: 'Login'});
+        })
+        .catch(err => {
+          console.log(err);
+        })
       }
     }
   }

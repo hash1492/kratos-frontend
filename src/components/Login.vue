@@ -27,6 +27,7 @@
 <script type="text/javascript">
 
   import Api from './../services/api/api.service'
+  import Auth from './../services/auth/auth.service'
 
   export default {
     name: 'Login',
@@ -48,6 +49,8 @@
         Api.post('/login', this.user)
         .then(response => {
           console.log(response);
+          Auth.setAuthToken(response.data.token);
+          this.$root.$emit('loginChanged', true);
           this.$router.push({ name: 'Home'});
         })
         .catch(err => {

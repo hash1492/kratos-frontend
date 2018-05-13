@@ -7,22 +7,27 @@
                         <img src="./../assets/logo.png" alt="App Logo">
                     </div>
                 </li>  
-                <li class="header-link d-none d-sm-block">
+                <li class="header-link d-none d-sm-block" v-if="isLoggedIn">
                     <router-link to="/home">Home</router-link>
                 </li>
-                <li class="header-link d-none d-sm-block">
+                <li class="header-link d-none d-sm-block" v-if="isLoggedIn">
                     <router-link to="/about">About</router-link>
                 </li>
-                <li class="header-link d-none d-sm-block">
+                <li class="header-link d-none d-sm-block" v-if="isLoggedIn">
                     <router-link to="/contact">Contact</router-link>
                 </li>
             </ul>
-            <ul class="header-links navigation-links-end d-none d-sm-flex">
+            <ul class="header-links navigation-links-end d-none d-sm-flex" v-if="!isLoggedIn">
                 <li class="header-link">
-                    <button class="btn btn-info">Login</button>
+                    <button class="btn btn-info" v-on:click="goToLogin()">Login</button>
                 </li>
                 <li class="header-link">
-                    <button class="btn btn-success">Signup</button>
+                    <button class="btn btn-success" v-on:click="goToRegister()">Register</button>
+                </li>
+            </ul>
+            <ul class="header-links navigation-links-end d-none d-sm-flex" v-if="isLoggedIn">
+                <li class="header-link">
+                    <button class="btn btn-info" v-on:click="logout()">Logout</button>
                 </li>
             </ul>
         </header>
@@ -30,8 +35,35 @@
 </template>
 
 <script>
+    import Auth from './../services/auth/auth.service'
+
     export default {
-        
+        data() {
+            return {
+                isLoggedIn: false
+            }
+        },
+        created: function() {
+            this.isLoggedIn = Auth.isLoggedIn();
+            this.$root.$on('loginChanged', loginStatus => {
+                console.log(loginStatus);
+                
+                this.isLoggedIn = loginStatus
+            })
+        },
+        methods: {
+            goToLogin: function () {
+                this.$router.push({ name: 'Login'});
+            },
+            goToRegister: function () {
+                this.$router.push({ name: 'Register'});
+            },
+            logout: function () {
+                Auth.removeAuthToken();
+                this.$root.$emit('loginChanged', false);
+                this.$router.push({ name: 'Login'});
+            }
+        }
     }
 </script>
 
