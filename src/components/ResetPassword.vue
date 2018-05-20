@@ -19,6 +19,7 @@
 <script type="text/javascript">
 
   import Api from './../services/api/api.service'
+  import Storage from './../services/storage/storage.service'
 
   export default {
     name: 'ResetPassword',
@@ -28,6 +29,13 @@
           password: '',
           confirmPassword: ''
         }
+      }
+    },
+    beforeCreate: function () {
+      const userId = Storage.get('forgotPasswordUser');
+      
+      if(!userId) {
+        this.$router.push({name: 'Login'});
       }
     },
     methods: {
@@ -47,6 +55,7 @@
         .then(response => {
           this.$toasted.show('Password reset successful!');
           console.log(response);
+          Storage.remove('forgotPasswordUser');
           this.$router.push({name: 'Login'});
         })
         .catch(err => {

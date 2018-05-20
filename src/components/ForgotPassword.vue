@@ -40,6 +40,7 @@
 <script type="text/javascript">
 
 import Api from './../services/api/api.service'
+import Storage from './../services/storage/storage.service'
 
 export default {
   name: "ForgotPassword",
@@ -113,11 +114,12 @@ export default {
         email: this.user.email,
         verificationCode: this.user.verificationCode
       };
-
+      
       Api.post('/verify-user', user)
       .then(response => {
         console.log(response);
         this.$toasted.show('Email is verified!');
+        Storage.set('forgotPasswordUser', response.data.id);
         this.$router.push({name: 'ResetPassword',  params: { userId: response.data.id }});
       })
       .catch(err => {
