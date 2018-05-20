@@ -53,7 +53,7 @@ export default new VueRouter({
       }
     },
     {
-      path: '/reset-password',
+      path: '/reset-password/:userId',
       name: 'ResetPassword',
       component: ResetPassword,
       beforeEnter: (to, from, next) => {

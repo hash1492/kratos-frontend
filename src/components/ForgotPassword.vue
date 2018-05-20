@@ -8,7 +8,7 @@
             <label>Email address</label>
             <input class="form-control" type="email" v-model="user.email" placeholder="Email">
           </div>
-          <button type="button" class="btn btn-info" v-on:click="sendEmail()">Send Email</button>
+          <button type="button" class="btn btn-info" :disabled="!user.email" v-on:click="sendEmail()">Send Email</button>
           <br><br>
           <div>
             <router-link to="/login">Remember your password? Login</router-link>
@@ -22,7 +22,7 @@
           </div>
           
           <div class="form-group">
-            <button type="button" class="btn btn-info" v-on:click="verifyUser()">Verify</button>
+            <button type="button" :disabled="!user.verificationCode" class="btn btn-info" v-on:click="verifyUser()">Verify</button>
           </div>
           <div class="form-group">
             <button type="button" class="btn btn-primary" :disabled="disableSendEmail" v-on:click="sendEmail()">Resend code</button>
@@ -56,6 +56,10 @@ export default {
   },
   methods: {
     sendEmail: function() {
+      if(!this.user.email) {
+        this.$toasted.show('Please enter an Email');
+        return 0;
+      }
       var self = this;
 
       let user = {
@@ -64,7 +68,10 @@ export default {
       Api.post('/forgot-password', user)
       .then(response => {
         console.log(response);
-              
+
+        this.$toasted.show('Verification code sent!');
+
+        self.user.id = response.data.userId;
         self.remainingSeconds = 10;
         self.disableSendEmail = true;
         var secondsInterval = setInterval(function(){
@@ -84,26 +91,46 @@ export default {
         self.showVerificationForm = true;
       })
       .catch(err => {
-        console.log(err);
+        console.log(err.response.data);
+        const errorCode = err.response.data.errorCode;
+        switch(errorCode) {
+          case 'USER_DOESNT_EXIST': 
+            this.$toasted.error('User with this email doesn\'t exist');
+            break;
+          case 'FORGOT_PASSWORD_FAILED': 
+            this.$toasted.error('Forgot password failed');
+            break;
+        }
       })
     },
     verifyUser: function() {
       if (!this.user.verificationCode) {
+        this.$toasted.show('Please enter the Verification code');
         return 0;
       }
 
       let user = {
-        email :this.user.email,
+        email: this.user.email,
         verificationCode: this.user.verificationCode
       };
 
       Api.post('/verify-user', user)
       .then(response => {
         console.log(response);
-        this.$router.push({name: 'ResetPassword'});
+        this.$toasted.show('Email is verified!');
+        this.$router.push({name: 'ResetPassword',  params: { userId: response.data.id }});
       })
       .catch(err => {
-        console.log(err);
+        console.log(err.response.data);
+        const errorCode = err.response.data.errorCode;
+        switch(errorCode) {
+          case 'USER_DOESNT_EXIST': 
+            this.$toasted.error('User with this email doesn\'t exist');
+            break;
+          case 'VERIFICATION_FAILED': 
+            this.$toasted.error('Verification failed');
+            break;
+        }
       })
 
     }

@@ -52,21 +52,31 @@
     methods: {
       register: function () {
         if (!this.user.firstName || !this.user.lastName || !this.user.email || !this.user.password) {
-          alert('Form is incomplete missing');
+          this.$toasted.error('Form is incomplete');
           return 0
         }
         if (this.user.password !== this.user.confirmPassword) {
-          alert('Passwords must match');
+          this.$toasted.error('Passwords must match');
           return 0
         }
         
         Api.post('/register', this.user)
         .then(response => {
           console.log(response);
+          this.$toasted.show('Registration successful');
           this.$router.push({ name: 'Login'});
         })
         .catch(err => {
-          console.log(err);
+          console.log(err.response.data);
+          const errorCode = err.response.data.errorCode;
+          switch(errorCode) {
+            case 'EXISTING_USER': 
+              this.$toasted.error('User with this email already exists');
+              break;
+            case 'REGISTRATION_FAILED': 
+              this.$toasted.error('Registration failed');
+              break;
+          }
         })
       }
     }

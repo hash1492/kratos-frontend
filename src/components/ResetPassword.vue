@@ -33,16 +33,30 @@
     methods: {
       resetPassword: function () {
         if (!this.user.password || !this.user.confirmPassword) {
-          return 0
+          this.$toasted.error('Password or Confirm password fields incomplete');
+          return 0;
         }
+
+        if(this.user.password !== this.user.confirmPassword) {
+          this.$toasted.error('Password and Confirm password fields must match');
+          return 0;
+        }        
+        this.user.id = this.$route.params.userId;
 
         Api.post('/reset-password', this.user)
         .then(response => {
+          this.$toasted.show('Password reset successful!');
           console.log(response);
           this.$router.push({name: 'Login'});
         })
         .catch(err => {
-          console.log(err);
+          console.log(err.response.data);
+          const errorCode = err.response.data.errorCode;
+          switch(errorCode) {
+            case 'USER_DOESNT_EXIST': 
+              this.$toasted.error('User with this email doesn\'t exist');
+              break;
+          }
         })
       }
     }

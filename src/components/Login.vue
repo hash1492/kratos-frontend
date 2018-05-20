@@ -42,19 +42,29 @@
     methods: {
       login: function () {
         if (!this.user.email || !this.user.password) {
-          alert('Email or password missing');
+          this.$toasted.error('Email or password missing');
           return 0
         }
 
         Api.post('/login', this.user)
         .then(response => {
           console.log(response);
+          this.$toasted.show(`Welcome ${response.data.firstName}!`);
           Auth.setAuthToken(response.data.token);
           this.$root.$emit('loginChanged', true);
           this.$router.push({ name: 'Home'});
         })
         .catch(err => {
-          console.log(err);
+          console.log(err.response.data);
+          const errorCode = err.response.data.errorCode;
+          switch(errorCode) {
+            case 'INCORRECT_PASSWORD': 
+              this.$toasted.error('Incorrect password');
+              break;
+            case 'USER_DOESNT_EXIST': 
+              this.$toasted.error('User doesn\'t exist');
+              break;
+          }
         })
   
       }
