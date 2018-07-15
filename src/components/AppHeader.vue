@@ -11,10 +11,13 @@
                     <router-link to="/home">Home</router-link>
                 </li>
                 <li class="header-link d-none d-sm-block" v-if="isLoggedIn">
-                    <router-link to="/about">About</router-link>
+                    <router-link to="/search">Search</router-link>
                 </li>
                 <li class="header-link d-none d-sm-block" v-if="isLoggedIn">
-                    <router-link to="/contact">Contact</router-link>
+                    <router-link to="/friend-requests">Requests</router-link>
+                </li>
+                <li class="header-link d-none d-sm-block" v-if="isLoggedIn">
+                    <router-link to="/my-friends">Friends</router-link>
                 </li>
             </ul>
             <ul class="header-links navigation-links-end d-none d-sm-flex" v-if="!isLoggedIn">
@@ -27,6 +30,7 @@
             </ul>
             <ul class="header-links navigation-links-end d-none d-sm-flex" v-if="isLoggedIn">
                 <li class="header-link">
+                    <router-link to="/my-profile" class="user-name">{{currentUser.firstName}}</router-link>
                     <button class="btn btn-info" v-on:click="logout()">Logout</button>
                 </li>
             </ul>
@@ -40,15 +44,27 @@
     export default {
         data() {
             return {
-                isLoggedIn: false
+                isLoggedIn: false,
+                currentUser: {}
             }
         },
         created: function() {
             this.isLoggedIn = Auth.isLoggedIn();
+            if(this.isLoggedIn) {
+                this.currentUser = Auth.getCurrentUser();
+                console.log(this.currentUser);
+            }
             this.$root.$on('loginChanged', loginStatus => {
                 console.log(loginStatus);
-                
-                this.isLoggedIn = loginStatus
+                this.isLoggedIn = loginStatus;
+                if(this.isLoggedIn) {
+                    this.currentUser = Auth.getCurrentUser();
+                    console.log(this.currentUser);
+                    
+                } else {
+                    Auth.removeCurrentUser();
+                    this.currentUser = {};
+                }
             })
         },
         methods: {
@@ -114,5 +130,10 @@
 
     .header-link a:hover {
         color:dodgerblue;
+    }
+
+    .header-link .user-name {
+        margin-right: 20px;
+        color: white;
     }
 </style>

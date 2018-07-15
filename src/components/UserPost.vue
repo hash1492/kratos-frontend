@@ -51,6 +51,7 @@
         margin-bottom: 10px;
     }
     .user-details img {
+        border-radius: 50%;
         width: 60px;
         margin-right: 15px;
     }

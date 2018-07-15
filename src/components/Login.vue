@@ -51,6 +51,8 @@
           console.log(response);
           this.$toasted.show(`Welcome ${response.data.firstName}!`);
           Auth.setAuthToken(response.data.token);
+          delete response.data.token;
+          Auth.setCurrentUser(response.data);
           this.$root.$emit('loginChanged', true);
           this.$router.push({ name: 'Home'});
         })

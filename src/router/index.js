@@ -8,6 +8,8 @@ import Home from '../components/Home.vue'
 import MyProfile from '../components/MyProfile.vue'
 import ViewOthersProfile from '../components/ViewOthersProfile.vue'
 import FriendsList from '../components/FriendsList.vue'
+import Search from '../components/Search.vue'
+import FriendRequests from '../components/FriendRequests.vue'
 
 import Auth from '../services/auth/auth.service'
 
@@ -77,12 +79,38 @@ export default new VueRouter({
       }
     },
     {
+      path: '/search',
+      name: 'Search',
+      component: Search,
+      beforeEnter: (to, from, next) => {
+        if(!Auth.isLoggedIn()) {
+          next({name: 'Login'});
+        } else {
+          next();
+        }
+      }
+    },
+    {
+      path: '/friend-requests',
+      name: 'FriendRequests',
+      component: FriendRequests,
+      beforeEnter: (to, from, next) => {
+        if(!Auth.isLoggedIn()) {
+          next({name: 'Login'});
+        } else {
+          next();
+        }
+      }
+    },
+    {
       path: '/my-profile',
       name: 'MyProfile',
       component: MyProfile,
       beforeEnter: (to, from, next) => {
         if(!Auth.isLoggedIn()) {
           next({name: 'Login'});
+        } else {
+          next();
         }
       }
     },
