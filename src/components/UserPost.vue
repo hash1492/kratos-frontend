@@ -2,19 +2,19 @@
     <div class="user-post">
         <div class="user-details">
             <img src="./../assets/avatar.png" class="user-avatar" alt="">
-            <span class="user-name">Harshil Shah</span>
+            <span class="user-name" >{{post.userId.firstName}} {{post.userId.lastName}}</span>
         </div>
 
         <div class="post-content">
-            <p class="post-text">On the way to Arizona!</p>
-            <img src="./../assets/post-img.jpg" class="post-image" alt="">
+            <p class="post-text">{{post.message}}</p>
+            <img v-if="post.photo" src="post.photo" class="post-image" alt="">
         </div>
         <div class="post-likes-comments">
             <div class="post-likes-count">
-                <span>35 likes</span>
+                <span>{{post.likes}} likes</span>
             </div>
             <div class="post-comments-count">
-                <span>9 comments</span>
+                <span>0 comments</span>
             </div>
         </div>
         <div class="post-actions">
@@ -34,7 +34,11 @@
 </template>
 <script>
     export default {
-        props: ['user']
+        props: ['post'],
+        created: function() {
+            console.log(this.post);
+            
+        }
     }
 </script>
 <style>
